@@ -1,34 +1,19 @@
 #!/bin/bash
 echo
 echo "================================="
-echo "EmonPi update started"
+echo "emonPi update started"
 echo "================================="
 echo
 echo "EUID: $EUID"
 echo
 
-# Needed for emonPi LCD Hi-Link 3G dongle support
-# ALLREADY INSTALLED
-# sudo pip install xmltodict
-# sudo pip install requests
 sudo pip install paho-mqtt --upgrade
 
+#########################################################################################################
 sudo /etc/init.d/emonhub stop
 
-echo "Start ATmega328 serial upload using avrdude with latest.hex"
-
-# Discrete Sampling
-echo "Discrete Sampling"
-#echo "avrdude -c arduino -p ATMEGA328P -P /dev/ttyAMA0 -b 115200 -U flash:w:/home/pi/emonpi/firmware/compiled/latest.hex"
-#avrdude -c arduino -p ATMEGA328P -P /dev/ttyAMA0 -b 115200 -U flash:w:/home/pi/emonpi/firmware/compiled/latest.hex
-echo "avrdude -c arduino -p ATMEGA328P -P /dev/ttyAMA0 -b 57600 -U flash:w:/home/pi/emonpi/firmware/compiled/latest.hex"
-avrdude -c arduino -p ATMEGA328P -P /dev/ttyAMA0 -b 57600 -U flash:w:/home/pi/emonpi/firmware/compiled/latest.hex
-
-# RFM12Pi with RFM12B update
-# avrdude -v -c arduino -p ATMEGA328P -P /dev/ttyAMA0 -b 38400 -U flash:w:/home/pi/RFM2Pi/firmware/RFM69CW_RF_Demo_ATmega328/RFM12_Demo_ATmega328.cpp.hex
-
-# RFM69Pi with RFM69CW Update
-# avrdude -v -c arduino -p ATMEGA328P -P /dev/ttyAMA0 -b 38400 -U flash:w:/home/pi/RFM2Pi/firmware/RFM69CW_RF_Demo_ATmega328/RFM69CW_RF12_Demo_ATmega328.cpp.hex
+# Start ATmega328 serial upload using avrdude with latest hex available on github
+/home/pi/emonpi/./update_emonPi.sh
 
 sudo /etc/init.d/emonhub start
 #########################################################################################################

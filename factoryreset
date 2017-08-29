@@ -2,7 +2,15 @@
 # Run sudo su
 # ./factoryreset
 
+echo
+echo "================================="
 echo "emonPi Factory reset script"
+echo "================================="
+echo
+
+echo "CAUTION: this will delete ALL Emoncms data"
+echo
+read -p "Press any key to continue...or CTRL+C to exit " -n1 -s
 
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root: sudo su ./factoryreset"

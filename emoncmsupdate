@@ -4,6 +4,7 @@ echo
 echo "================================="
 echo "Emoncms update started"
 echo "Update script V1.1.0"
+echo "================================="
 echo
 
 date
