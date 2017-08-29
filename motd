@@ -8,15 +8,19 @@
 ║ 888    .o  888   888   888  888   888  888   888   888          888  ║
 ║ `Y8bod8P' o888o o888o o888o `Y8bod8P' o888o o888o o888o        o888o ║
 ╚══════════════════════════════════════════════════════════════════════╝
-[1;31m
+[0m
 The programs included with the Debian GNU/Linux system are free software;
 the exact distribution terms for each program are described in the
 individual files in /usr/share/doc/*/copyright.
 
 Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 permitted by applicable law.
+[1;31m
+The file system is in Read Only (RO) mode.
+[0m
+If you need to make changes,
+[1;32muse the command 'rpi-rw' to put the file system in Read Write (RW) mode.
+[1;31mUse 'rpi-ro' to return to Read Only (RO) mode.
 [1;32m
-The file system is in Read Only (RO) mode. If you need to make changes, 
-use the command 'rpi-rw' to put the file system in Read Write (RW) mode. 
-Use 'rpi-ro' to return to RO mode. The /home/pi/data directory is always in RW mode.
+The /home/pi/data directory is always in Read Write (RW) mode.
 [0m

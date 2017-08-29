@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # pylint: disable=line-too-long
 
@@ -56,15 +57,18 @@ hilink_device_ip = '192.168.1.1'
 # I2C LCD: each I2C address will be tried in consecutive order until LCD is found
 # The first address that matches a device on the I2C bus will be used for the I2C LCD
 # ------------------------------------------------------------------------------------
-lcd_i2c = ['27', '3f']
+#lcd_i2c = ['20', '21', '22', '23', '24', '25', '26', '27']  #PCF8574T default address is 0x27
+lcd_i2c = ['38', '39', '3a', '3b', '3c', '3d', '3e', '3f']  #PCF8574AT default address is 0x3f
 current_lcd_i2c = ''
+
 # LCD backlight timeout in seconds
 # 0: always on, 300: off after 5 min
 backlight_timeout = 300
+
 # ------------------------------------------------------------------------------------
 
 # Default Startup Page
-max_number_pages = 7
+max_number_pages = 8
 
 # ------------------------------------------------------------------------------------
 # Start Logging
@@ -104,18 +108,20 @@ def shutdown(lcd):
     time.sleep(4)
     # backlight zero must be the last call to the LCD to keep the backlight off
     lcd.backlight = 0
-    subprocess.call('halt', shell=False)
+    #subprocess.call('halt', shell=False)
+    subprocess.call('poweroff', shell=False)
     sys.exit(0)  # end script
 
 
 class LCD(object):
     def __init__(self, logger):
-        # Scan I2C bus for LCD I2C addresses as defined in led_i2c, we have a couple of models of LCD which have different adreses that are shipped with emonPi. First I2C device to match address is used.
+        # Scan I2C bus for LCD I2C addresses as defined in led_i2c, we have few models of LCD which have different addresses that are shipped with emonPi
+        # First I2C device to match address is used
         self.logger = logger
         for i2c_address in lcd_i2c:
           lcd_status = subprocess.check_output(["/home/pi/emonpi/lcd/emonPiLCD_detect.sh", "%s" % i2c_address])
           if lcd_status.rstrip() == 'True':
-            print "I2C LCD DETECTED Ox%s" % i2c_address
+            print "I2C LCD DETECTED  on Ox%s" % i2c_address
             logger.info("I2C LCD DETECTED 0x%s" % i2c_address)
             current_lcd_i2c = "0x%s" % i2c_address
             break
@@ -212,6 +218,12 @@ def main():
     lcd[0] = "emonPi Build:"
     lcd[1] = sd_image_version
     logger.info("SD card image build version: " + sd_image_version)
+
+    #Get CPU temperature using 'vcgencmd measure_temp'
+    cpu_temp = ""
+    cpu_t = os.popen('vcgencmd measure_temp').readline()
+    cpu_temp = (cpu_t.replace("temp=","").replace("'C\n","\337C"))
+    print cpu_temp
 
     # Set up the buttons and install handlers
     atexit.register(GPIO.cleanup)
@@ -379,7 +391,7 @@ def main():
             if basedata is not None:
                 basedata = basedata.split(",")
                 lcd[0] = 'VRMS: ' + basedata[3] + "V"
-                lcd[1] = 'Temp 1: ' + basedata[4] + " C"
+                lcd[1] = 'Temp 1: ' + basedata[4] + "\337C"
             else:
                 lcd[0] = 'ERROR: MQTT'
                 lcd[1] = 'Not connected'
@@ -388,7 +400,7 @@ def main():
             basedata = r.get("basedata")
             if basedata is not None:
                 basedata = basedata.split(",")
-                lcd[0] = 'Temp 2: ' + basedata[5] + "C"
+                lcd[0] = 'Temp 2: ' + basedata[5] + "\337C"
                 lcd[1] = 'Pulse: ' + basedata[10] + "p"
             else:
                 lcd[0] = 'ERROR: MQTT'
@@ -399,6 +411,10 @@ def main():
             lcd[1] = 'Uptime %.2f days' % (seconds / 86400)
 
         elif page == 7:
+            lcd[0] = 'CPU temp: '
+            lcd[1] = '>>> ' + cpu_temp
+
+        elif page == 8:
             lcd[0] = "emonPi Build:"
             lcd[1] = sd_image_version
 

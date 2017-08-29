@@ -2,8 +2,9 @@
 #
 # rc.local
 
-
-/usr/bin/printf " My IP address is\033[0;31m `/sbin/ifconfig | grep "inet addr" | grep -v "127.0.0.1" | awk '{ print $2 }' | awk -F: '{ print $2 }'` \033[0m\n"
+/usr/bin/printf "\033[0;00m ======================================================================\n"
+/usr/bin/printf "\033[1;34m \nMy IP address is: `/sbin/ifconfig | grep "inet addr" | grep -v "127.0.0.1" | awk '{ print $2 }' | awk -F: '{ print $2 }'` \033[0m\n\n"
+/usr/bin/printf "\033[0;00m ======================================================================\n"
 
 # Will only run if /var/log is mounted in tmpfs
 if ( mount | grep "on /var/log "| grep -q "^tmpfs " )
@@ -30,13 +31,23 @@ fi
 su pi -c '/home/pi/emonpi/./firstbootupdate'
 
 # wait for mosquitto to restart then restart services than depend on MQTT
-sleep 5
+#sleep 5
 service emonPiLCD restart
 sleep 5
 service mqtt_input restart
 service lwrfd restart
 
 ## Start Wifi AP (uncomment if required) see emonpi/wifiAP/readme.md
-/home/pi/emonpi/wifiAP/startAP.sh
+#/home/pi/emonpi/wifiAP/startAP.sh
+
+# Load hwclock @ boot 
+echo ds1307 0x68 > /sys/class/i2c-adapter/i2c-1/new_device	# load the device
+hwclock -s							# set time from device not from internet
+date								# check time
+
+# Turn on GSM modem @ boot
+echo 24 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio24/direction
+echo 1 > /sys/class/gpio/gpio24/value
 
 exit 0

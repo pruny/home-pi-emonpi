@@ -1,4 +1,5 @@
 #!/bin/sh
 sudo mount -o remount,ro /dev/mmcblk0p2  /
-echo "Filesystem is locked - Read Only access"
-echo "type ' rpi-rw ' to unlock"
+echo "\033[01;31mFilesystem is locked - Read Only access"
+echo "\033[01;32mtype 'rpi-rw' to unlock"
+sudo sh -c "echo $(date) ro >> /home/pi/data/shared/ro-rw.log"
