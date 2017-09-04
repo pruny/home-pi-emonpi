@@ -1,0 +1,117 @@
+
+#-----------#
+### BEGIN ###
+#-----------#
+
+# cron mail receipt
+#------------------
+MAILTO=rpi.kontroller@gmail.com
+
+
+
+# WiFi restart if the connection is down
+#---------------------------------------
+*/5 * * * * /usr/local/bin/wifi-check > /home/pi/data/wificheck.log 2>&1
+
+
+
+# Force NTP update every 1 hour 
+
+0 * * * * /home/pi/emonpi/ntp_update.sh >> /var/log/ntp_update.log 2>&1
+
+
+
+#---------------------#
+# email after startup #
+#---------------------#
+@reboot sleep 1m && /home/pi/usefulscripts/email@startup/bootEmail.sh > /dev/null 2>&1
+
+
+
+
+#-----------------------------------------------#
+# reading external IP and email this if changed #
+#-----------------------------------------------#
+*/10 * * * * cd /home/pi/usefulscripts/email@IPchange && /home/pi/usefulscripts/email@IPchange/ip.sh > /dev/null 2>&1
+@reboot sleep 2m && if [ ! -d /var/www/TMPFS/IP ]; then mkdir /var/www/TMPFS/IP ; fi &&  echo "$(dig +short myip.opendns.com @resolver1.opendns.com)" > /var/www/TMPFS/IP/ip.txt
+
+
+
+#-------------#
+# update motd #
+#-------------#
+* * * * * /home/pi/emonpi/update-motd > /dev/null 2>&1
+
+
+
+
+#-----------------#
+# empty RAM drive #
+#-----------------#
+#0 0 * * * if [ -d /var/www/TMPFS/pin_status ]; then mv -f -u /var/www/TMPFS/pin_status/{*,.*} /home/pi/data/shared/pin_status ; fi > /dev/null 2>&1
+
+
+
+
+#--------------#
+# GPIO manager #
+#--------------#
+
+# @ reboot, make gpio function mode & load catched gpio-outputs states
+#---------------------------------------------------------------------
+@reboot /home/rpi/bin/pin_status/get_pins.sh > /dev/null 2>&1
+
+
+
+
+#---------------------------------------------------#
+# LHT (serial to arduino & HTU21DF-TSL2561 sensors) #
+#---------------------------------------------------#
+
+# restarting LHT service if broken
+#---------------------------------
+*/10 * * * * /home/rpi/bin/lht/LHT_log/chech_LHT.service.sh
+
+# creating graph for enviromental parameters in greenhouse every 5 minutes
+#-------------------------------------------------------------------------
+*/5 * * * * sleep 30 && cd /home/rpi/bin/lht/LHT_log && /home/rpi/bin/lht/LHT_log/GRAPH.sh > /dev/null 2>&1
+
+
+
+
+#----------------------------------#
+# 1wire temperature sensor DS18B20 #
+#----------------------------------#
+
+# reading temperature sensors every minutes and update database
+#--------------------------------------------------------------
+* * * * * cd /home/rpi/bin/1wire/ds18b20/temp_log#6 && /home/rpi/bin/1wire/ds18b20/temp_log#6/get_TH.pl > /dev/null 2>&1
+
+# reading temperature sensors every minuts and write this into RAM to view in browser
+#------------------------------------------------------------------------------------
+* * * * * /home/rpi/bin/1wire/ds18b20/thermo/thermometer.sh  > /dev/null 2>&1
+
+# creating graphs for temperature sensors every 5 minutes
+#--------------------------------------------------------
+*/5 * * * * cd /home/rpi/bin/1wire/ds18b20/temp_log#6 && /home/rpi/bin/1wire/ds18b20/temp_log#6/GRAPH.sh > /dev/null 2>&1
+
+
+
+
+#-----------#
+# GSM modem #
+#-----------#
+
+# check status of gsm modem to view state in browser - daemonised;-)) script
+#---------------------------------------------------------------------------
+* * * * * /home/rpi/bin/gsm/status/check_status_gsm.py > /dev/null 2>&1
+
+# archive log file of sms service (gammu-smsd)
+#---------------------------------------------
+0 0 * * * /home/rpi/bin/gsm/gammu-smsd/archiving_logs.sh > /dev/null 2>&1
+
+# change mode of gsm modem commanded from browser - daemonised;-)) script
+#---------------------------------------------------------------------------
+* * * * * /home/rpi/bin/gsm/status/change_mode_gsm.py > /dev/null 2>&1
+
+
