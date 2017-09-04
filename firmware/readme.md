@@ -2,7 +2,7 @@
 
 **See continous-sampling branch for continous sampling**
 
-# V2.8.2 (07/04/17)
+# V2.8.3 (07/04/17)
 
 * Reduce min pulse width to 60ms
 
