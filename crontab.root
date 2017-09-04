@@ -115,3 +115,9 @@ MAILTO=rpi.kontroller@gmail.com
 * * * * * /home/rpi/bin/gsm/status/change_mode_gsm.py > /dev/null 2>&1
 
 
+
+
+#--------------------------------------#
+# THERMOMETERS (1wire DS18B20 sensors) #
+#--------------------------------------#
+
